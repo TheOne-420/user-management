@@ -1,0 +1,62 @@
+{
+  "title": "User Management",
+  "fields": [
+    {
+      "name": "fullName",
+      "label": "Full Name",
+      "type": "text",
+      "placeholder": "Enter full name",
+      "table": true,
+      "validation": {
+        "required": true,
+        "minLength": 3,
+        "maxLength": 50
+      }
+    },
+    {
+      "name": "email",
+      "label": "Email",
+      "type": "email",
+      "placeholder": "Enter email address",
+      "table": true,
+      "validation": {
+        "required": true,
+        "format": "email"
+      }
+    },
+    {
+      "name": "age",
+      "label": "Age",
+      "type": "number",
+      "placeholder": "Enter age",
+      "table": true,
+      "validation": {
+        "required": true,
+        "min": 18,
+        "max": 100
+      }
+    },
+    {
+      "name": "role",
+      "label": "Role",
+      "type": "select",
+      "options": ["Admin", "Editor", "Viewer"],
+      "table": true,
+      "validation": {
+        "required": true
+      }
+    },
+    {
+      "name": "bio",
+      "label": "Bio",
+      "type": "textarea",
+      "placeholder": "Write something about yourself",
+      "table": false,
+      "validation": {
+        "required": false,
+        "minLength": 20,
+        "maxLength": 300
+      }
+    }
+  ]
+}
