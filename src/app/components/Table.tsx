@@ -37,7 +37,7 @@ function Table() {
     
   }, []);
   
-  
+  console.log(dummyData);
   return (
     <>
       {/* <input

@@ -17,7 +17,7 @@ function Form() {
     fullName: "",
     email: "",
     age: 0,
-    role: "",
+    role: "Viewer",
     bio: "",
   };
   const [formData, setFormData] = useState(initialFormState);
@@ -49,6 +49,7 @@ function Form() {
       
       setFields(result?.fields);
       setIsLoading(false);
+      console.log(isLoading)
     }
     loadFields();
   }, []);

@@ -1,6 +1,7 @@
 
 
-import { User } from '../validation/schema';
+
+import { User } from '../validation/UserSchema';
 import { getUsers } from './getUsers';
 
 function addUser(user : User) {
