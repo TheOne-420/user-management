@@ -1,11 +1,13 @@
 "use client";
 
 import React, { FormEvent, Suspense, useEffect, useState } from "react";
+import userSchema from '@/app/lib/schema.json'
 import addUser from "../actions/addUser";
 import z from "zod";
 import { UserSchema, type User } from "../validation/UserSchema";
 import Loading from "./Loading";
 import FormFields from "./FormFields";
+import Navbar from "./Navbar";
 type Field = {
   name: string;
   label: string;
@@ -21,7 +23,7 @@ function Form() {
     role: "",
     bio: "",
   };
-  const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [fields, setFields] = useState<Field[]>([]);
   const [errors, setErrors] = useState<{
@@ -29,41 +31,48 @@ function Form() {
   }>();
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setErrors(null);
     const res = z.safeParse(UserSchema, formData);
-
+    console.log(formData)
     if (!res.success) {
-      console.log(formData);
+      console.log("ERROR", res?.error)
       setErrors(z.flattenError(res.error)?.fieldErrors);
+      console.log(formData)
     } else {
-      setErrors(undefined);
       addUser(formData);
+      setFormData({});
     }
-    setFormData(initialFormState);
+    
   }
   useEffect(() => {
-    async function loadFields() {
+     function loadFields() {
       setIsLoading(true);
-      const response = await fetch("/schema.json");
-      const result = await response.json();
-
+      const result = userSchema;
       setFields(result?.fields);
       setIsLoading(false);
     }
     loadFields();
   }, []);
   return (
+    <>
+    <Navbar />
     <Suspense fallback={<p>Loading...</p>}>
       {false ? (
         <Loading />
       ) : (
+        
+        <div  className='overflow-auto'>
+
         <form
-          className=' w-screen h-screen flex   border-rounded-md '
+          className='overflow-auto w-screen h-screen flex   border-rounded-md '
           onSubmit={handleSubmit}
-        >
+          >
           <FormFields fields={fields} formData={formData} setFormData={setFormData}  errors={errors} setErrors={setErrors}/>
         </form>
+          </div>
       )}
     </Suspense>
+      </>
   );
 }
 

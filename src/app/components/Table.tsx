@@ -8,6 +8,7 @@ import { getUserById } from "../actions/getUserById";
 import z, { regex } from "zod";
 import EditModal from "./EditModal";
 import { updateUsers } from "../actions/updateUsers";
+import Navbar from "./Navbar";
 const dummyData = [
   {
     fullName: "Tabish",
@@ -76,6 +77,7 @@ function Table() {
     setErrors(null);
     if (!userToEdit) {
       return;
+      
     }
     const res = z.safeParse(UserSchema, userToEdit);
 
@@ -95,6 +97,7 @@ function Table() {
   }
   return (
     <>
+    <Navbar  />
       <div className='overflow-auto w-screen p-4 h-screen flex flex-col place-content-center text-primary'>
         <input
           type='text'
@@ -108,7 +111,7 @@ function Table() {
         />
           
         
-        <table className='w-full bg-gray-600'>
+        <table className='w-full bg-gray-600 '>
           <thead>
             <tr className='text-left  border-b-4 border-gray-400 font-bold'>
               {headers?.map((header, i) => {
@@ -176,24 +179,24 @@ function Table() {
                     (header, j) =>
                       header && (
                         <td key={`cell${i}-${j}`}>
-                          <p className='w-48 overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
+                          <p className=' overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
                             {data[header as keyof User]}
                           </p>
                         </td>
                       )
                   )}
                   <div className='grid place-content-center text-primary '>
-                    <td className='w-full'>
+                    <td className=''>
                       <button
-                        className=' w-full  bg-blue-700 p-2 rounded-md'
+                        className='  bg-blue-700 p-2 rounded-md'
                         onClick={() => handleEdit(data.id)}
                       >
                         EDIT
                       </button>
                     </td>
-                    <td className='w-full'>
+                    <td className=''>
                       <button
-                        className=' w-full bg-red-700  p-2 rounded-md'
+                        className=' bg-red-700  p-2 rounded-md'
                         onClick={() => handleDelete(data.id)}
                       >
                         DELETE

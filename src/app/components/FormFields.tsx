@@ -5,9 +5,9 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
  
   const [isLoading, setIsLoading] = useState(true);
  
- 
+
   return (
-    <div className='bg-primary  text-secondary m-auto w-[70%] flex flex-col p-4  place-content-center border-neutral border-2 rounded-md'>
+    <div className=' bg-primary   text-secondary dark:bg-secondary-dark dark:text-accent-dark m-auto w-[70%] flex flex-col p-4  place-content-center border-neutral border-2 rounded-md'>
       {fields?.map((field, idx) => {
         const { name, label, placeholder, type, options } = field;
         switch (type) {
@@ -21,7 +21,7 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   name={name}
                   id={name}
                   placeholder={placeholder}
-                  className={` ${errors && errors[name] ? "border-red-400" : "border-secondary "} overflow-ellipsis  rounded-md border-2 px-2   placeholder:text-secondary`}
+                  className={` ${errors && errors[name] ? "border-red-400" : "border-secondary dark:border-primary-dark "} overflow-ellipsis  rounded-md border-2 px-2   placeholder:text-secondary placeholder:dark:text-accent-dark`}
                   value={formData[name as keyof User]}
                   onChange={(e) => {
                     const newValue: string = e.target.value;
@@ -47,9 +47,11 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                 <select
                   name={name}
                   id={name}
-                  className={` ${errors && errors[name] ? "outline-red-400" : "outline-secondary ring-secondary "} overflow-ellipsis rounded-md border-2 px-2   placeholder:text-secondary `}
+                  className={` ${errors && errors[name] ? "outline-red-400" : "outline-secondary dark:border-primary-dark dark:outline-primary-dark "} overflow-ellipsis rounded-md border-2 px-2   placeholder:text-secondary placeholder:dark:text-accent-dark`}
                   onChange={(e) => {
-                    let newValue: string | number = e.target.value;
+
+                    let newValue = e.target.value;
+                    console.log("New",newValue)
                     if (!isNaN(Number(newValue))) {
                       newValue = Number(newValue);
                     }
@@ -63,9 +65,10 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                     Choose a role
                   </option>
                   {options?.map((option: string, i: number) => {
+                    
                     return (
                       <option
-                        className={` overflow-ellipsis border-neutral rounded-md border-2 px-2 text-black`}
+                        className={` overflow-ellipsis hover:text-accent-dark hover:dark:bg-primary-dark  rounded-md border-2 px-2 dark:text-accent-dark text-black dark:bg-accent`}
                         key={i}
                         value={option}
                       >
@@ -121,8 +124,8 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   type={type}
                   name={name}
                   placeholder={placeholder} 
-                  className={`${errors && errors[name] ? "border-red-400" : "border-secondary "} overflow-ellipsi rounded-md border-2  px-2`}
-                  value={formData[name as keyof User]}
+                  className={`${errors && errors[name] ? "border-red-400" : "border-secondary dark:border-primary-dark"} overflow-ellipsi rounded-md border-2  px-2`}
+                  value={formData[name as keyof User] ?? ""}
                   onChange={(e) => {
                     let newValue: string | number = e.target.value;
                     if (!isNaN(Number(newValue))) {
@@ -142,7 +145,7 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
             );
         }
       })}
-      <button type='submit' className='bg-secondary rounded-md text-primary'>
+      <button type='submit' className='bg-secondary dark:bg-accent-dark dark:text-primary-dark rounded-md text-primary'>
         Submit
       </button>
     </div>

@@ -28,7 +28,7 @@ function EditModal({userToEdit, handleSubmit, setUserToEdit, errors}) {
         }
         
         
-        <button type="submit" className="bg-blue-700 text-accent p-2 rounded-md">Save Changes</button>
+        <button type="submit" className="bg-primary text-secondary dark:bg-secondary-dark dark:text-accent-dark p-2 rounded-md">Save Changes</button>
       </form>
     );
 }

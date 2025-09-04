@@ -1,26 +1,15 @@
-"use client"
-import { Suspense, useState } from "react";
-import Form from "./components/Form";
-import Table from "./components/Table";
-import Loading from "./components/Loading";
+
+import Navbar from "./components/Navbar";
 
 export default function Home() {
-  const [currentComponent, setCurrentComponent] = useState("Form");
+  
   return (
-    <main className="overflow-hidden">
-      <ul className="sticky top-5 grid place-self-center grid-cols-2 gap-2 border-1 rounded-md  bg-secondary text-accent ">
-        <li className="bg-secondary text-primary text-pretty  border-primary  border-r-2 p-2">
-          <button onClick={()=>setCurrentComponent("Form")}>Form</button>
-         
-        </li>
-        <li className="bg-secondary text-primary text-pretty p-2"><button onClick={()=> setCurrentComponent("Table")}>Table</button></li>
-
-      </ul>
-      <Suspense fallback={<Loading/>}>
-
-     { currentComponent == "Form" ? <Form/> : <Table/>}
-      </Suspense>
+    <main className="overflow-hidden dark:bg-primary-dark dark:text-accent-dark">
+      
+    <Navbar  />
       
     </main>
   );
+
+ 
 }
