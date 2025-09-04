@@ -6,7 +6,8 @@ import { getUsers } from './getUsers';
 
 function addUser(user : User) {
     const users = getUsers();
-    users.push(user);
+    const id = Date.now()
+    users.push({id, ...user});
     localStorage.setItem("users",JSON.stringify(users))
 }
 

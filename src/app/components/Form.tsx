@@ -49,7 +49,6 @@ function Form() {
       
       setFields(result?.fields);
       setIsLoading(false);
-      console.log(isLoading)
     }
     loadFields();
   }, []);

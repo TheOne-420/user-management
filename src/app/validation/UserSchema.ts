@@ -1,6 +1,7 @@
 
 import z from "zod";
 export const UserSchema = z.object({
+    
     fullName: z.string().min(3,  {error: "Fullname must have >= 3 characters"}).max(50,  {error: "Fullname must have <= 50 characters"}),
     email : z.email(),
     age: z.number().min(18, {error: "Age must be >= 18"}).max(100, {error: "Age must be <= 100"}),
