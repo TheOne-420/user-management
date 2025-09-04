@@ -9,6 +9,7 @@ import z, { regex } from "zod";
 import EditModal from "./EditModal";
 import { updateUsers } from "../actions/updateUsers";
 import Navbar from "./Navbar";
+import { ArrowBigLeftDash, ArrowBigRightDash } from "lucide-react";
 const dummyData = [
   {
     fullName: "Tabish",
@@ -28,11 +29,14 @@ const dummyData = [
 function Table() {
   const [users, setUsers] = useState<User[] | null>(null);
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage, setUsersPerPage] = useState(5); // Or any number you choose
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | "">("");
   const [fields, setFields] = useState(null);
   const [errors, setErrors] = useState(null);
   const [headers, setHeaders] = useState<string[]>([]);
+
   useEffect(() => {
     async function loadFields() {
       const response = await fetch("/schema.json");
@@ -58,7 +62,7 @@ function Table() {
         return regex.test(user.email) || regex.test(user.fullName);
       } catch (error) {
         console.error(error);
-        setSearchTerm("")
+        setSearchTerm("");
       }
     });
     setFilteredUsers(searchResults);
@@ -77,7 +81,6 @@ function Table() {
     setErrors(null);
     if (!userToEdit) {
       return;
-      
     }
     const res = z.safeParse(UserSchema, userToEdit);
 
@@ -95,9 +98,15 @@ function Table() {
     window?.location.reload();
     updateUsers(updatedUsers!);
   }
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users?.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users?.length || 1 / usersPerPage);
+
   return (
     <>
-    <Navbar  />
+      <Navbar />
       <div className='overflow-auto w-screen p-4 h-screen flex flex-col place-content-center text-primary'>
         <input
           type='text'
@@ -107,10 +116,8 @@ function Table() {
           placeholder='Search by name/email'
           className=' text-center font-bold  bg-accent rounded-md border-b-0 placeholder:text-primary placeholder:font-light placeholder:text-center w-full'
           onChange={(e) => setSearchTerm(e.target.value)}
-          
         />
-          
-        
+
         <table className='w-full bg-gray-600 '>
           <thead>
             <tr className='text-left  border-b-4 border-gray-400 font-bold'>
@@ -133,80 +140,63 @@ function Table() {
           </thead>
 
           <tbody>
-            {!searchTerm &&
-              users?.map((data, i) => (
-                <tr
-                  key={`row${i}`}
-                  className=' not-odd:bg-lime-600  text-left border-b border-gray-200'
-                >
-                  {headers?.map(
-                    (header, j) =>
-                      header && (
-                        <td key={`cell${i}-${j}`}>
-                          <p className='w-48 overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
-                            {data[header as keyof User]}
-                          </p>
-                        </td>
-                      )
-                  )}
-                  <div className='grid place-content-center text-primary '>
-                    <td className='w-full'>
-                      <button
-                        className=' w-full  bg-blue-700 p-2 rounded-md'
-                        onClick={() => handleEdit(data.id)}
-                      >
-                        EDIT
-                      </button>
-                    </td>
-                    <td className='w-full'>
-                      <button
-                        className=' w-full bg-red-700  p-2 rounded-md'
-                        onClick={() => handleDelete(data.id)}
-                      >
-                        DELETE
-                      </button>
-                    </td>
-                  </div>
-                </tr>
-              ))}
-            {searchTerm &&
-              filteredUsers?.map((data, i) => (
-                <tr
-                  key={`row${i}`}
-                  className=' not-odd:bg-lime-600  text-left border-b border-gray-200'
-                >
-                  {headers?.map(
-                    (header, j) =>
-                      header && (
-                        <td key={`cell${i}-${j}`}>
-                          <p className=' overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
-                            {data[header as keyof User]}
-                          </p>
-                        </td>
-                      )
-                  )}
-                  <div className='grid place-content-center text-primary '>
-                    <td className=''>
-                      <button
-                        className='  bg-blue-700 p-2 rounded-md'
-                        onClick={() => handleEdit(data.id)}
-                      >
-                        EDIT
-                      </button>
-                    </td>
-                    <td className=''>
-                      <button
-                        className=' bg-red-700  p-2 rounded-md'
-                        onClick={() => handleDelete(data.id)}
-                      >
-                        DELETE
-                      </button>
-                    </td>
-                  </div>
-                </tr>
-              ))}
+            {(!searchTerm ? currentUsers : filteredUsers)?.map((data, i) => (
+              <tr
+                key={`row${i}`}
+                className=' not-odd:bg-lime-600  text-left border-b border-gray-200'
+              >
+                {headers?.map(
+                  (header, j) =>
+                    header && (
+                      <td key={`cell${i}-${j}`}>
+                        <p className='w-48 overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
+                          {data[header as keyof User]}
+                        </p>
+                      </td>
+                    )
+                )}
+                <div className='grid place-content-center text-primary '>
+                  <td className='w-full'>
+                    <button
+                      className=' w-full  bg-blue-700 p-2 rounded-md'
+                      onClick={() => handleEdit(data.id)}
+                    >
+                      EDIT
+                    </button>
+                  </td>
+                  <td className='w-full'>
+                    <button
+                      className=' w-full bg-red-700  p-2 rounded-md'
+                      onClick={() => handleDelete(data.id)}
+                    >
+                      DELETE
+                    </button>
+                  </td>
+                </div>
+              </tr>
+            ))}
           </tbody>
         </table>
+        <div className='flex justify-center mt-4'>
+          <button
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className='inline-flex place-content-center gap-2  p-2 mx-1 w-25 bg-gray-500 rounded'
+          >
+            < ArrowBigLeftDash />
+            Previous 
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className='inline-flex place-content-center gap-2 p-2 w-25 mx-1 bg-gray-500 rounded'
+          >
+            Next <ArrowBigRightDash />
+          </button>
+        </div>
         {userToEdit && (
           <EditModal
             userToEdit={userToEdit}
