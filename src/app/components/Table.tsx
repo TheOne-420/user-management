@@ -5,7 +5,7 @@ import { getUsers } from "../actions/getUsers";
 import { User, UserSchema } from "../validation/UserSchema";
 import { deleteUser } from "../actions/deleteUser";
 import { getUserById } from "../actions/getUserById";
-import z from "zod";
+import z, { regex } from "zod";
 import EditModal from "./EditModal";
 import { updateUsers } from "../actions/updateUsers";
 const dummyData = [
@@ -26,7 +26,9 @@ const dummyData = [
 ];
 function Table() {
   const [users, setUsers] = useState<User[] | null>(null);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | "">("");
   const [fields, setFields] = useState(null);
   const [errors, setErrors] = useState(null);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -45,25 +47,43 @@ function Table() {
     loadFields();
     setUsers(getUsers());
   }, []);
-  function handleEdit(id:string) {
-      setUserToEdit(getUserById(id));
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchTerm(searchTerm);
+    }, 1500);
+    const searchResults = users?.filter((user) => {
+      const regex = new RegExp(searchTerm, "i");
+      try {
+        return regex.test(user.email) || regex.test(user.fullName);
+      } catch (error) {
+        console.error(error);
+        setSearchTerm("")
+      }
+    });
+    setFilteredUsers(searchResults);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm, users]);
+  function handleEdit(id: string) {
+    setUserToEdit(getUserById(id));
   }
-  function handleDelete(id: string){
+  function handleDelete(id: string) {
     setUsers(deleteUser(id));
   }
-   function handleSubmit(e: FormEvent){
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setErrors(null)
+    setErrors(null);
     if (!userToEdit) {
       return;
     }
-    const res = z.safeParse(UserSchema,userToEdit);
+    const res = z.safeParse(UserSchema, userToEdit);
 
     if (!res.success) {
       setErrors(z.flattenError(res.error).fieldErrors);
       return;
     }
-    const updatedUsers = users?.map(user => {
+    const updatedUsers = users?.map((user) => {
       if (user.id === userToEdit.id) {
         return userToEdit;
       }
@@ -71,23 +91,23 @@ function Table() {
     });
     setUserToEdit(null);
     window?.location.reload();
-    updateUsers(updatedUsers!)
+    updateUsers(updatedUsers!);
   }
   return (
     <>
-      {/* <input
-        type='text'
-        name='search'
-        id='search'
-        placeholder='Search by name/email'
-        className='bg-black placeholder:text-accent placeholder:font-light placeholder:text-center w-full'
-      /> */}
-      <div className='overflow-auto w-screen p-4 h-screen flex flex-col place-content-center text-accent'>
-        {users ? (
-          <h1 className='font-bold  text-black'>Users from localStorage</h1>
-        ) : (
-          <h1>Dummy Data</h1>
-        )}
+      <div className='overflow-auto w-screen p-4 h-screen flex flex-col place-content-center text-primary'>
+        <input
+          type='text'
+          name='search'
+          id='search'
+          value={searchTerm}
+          placeholder='Search by name/email'
+          className=' text-center font-bold  bg-accent rounded-md border-b-0 placeholder:text-primary placeholder:font-light placeholder:text-center w-full'
+          onChange={(e) => setSearchTerm(e.target.value)}
+          
+        />
+          
+        
         <table className='w-full bg-gray-600'>
           <thead>
             <tr className='text-left  border-b-4 border-gray-400 font-bold'>
@@ -110,44 +130,88 @@ function Table() {
           </thead>
 
           <tbody>
-            {users?.map((data, i) => (
-              <tr
-                key={`row${i}`}
-                className= ' not-odd:bg-lime-600  text-left border-b border-gray-200'
-              >
-                {headers?.map(
-                  (header, j) =>
-                    header && (
-                      <td key={`cell${i}-${j}`}>
-                        <p className='w-48 overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
-                          {data[header as keyof User]}
-                        </p>
-                      </td>
-                    )
-                )}
-                <div className='grid place-content-center '>
-                  <td className='w-full'>
-                    <button className=' w-full  bg-blue-700 text-accent p-2 rounded-md'
-                    onClick={()=>handleEdit(data.id)}
-                    >
-                      EDIT
-                    </button>
-                  </td>
-                  <td className='w-full'>
-                    <button className=' w-full bg-red-700 text-accent p-2 rounded-md'
-                    onClick={()=>handleDelete(data.id)}
-                    >
-                      DELETE
-                    </button>
-                  </td>
-                </div>
-              </tr>
-            ))}
+            {!searchTerm &&
+              users?.map((data, i) => (
+                <tr
+                  key={`row${i}`}
+                  className=' not-odd:bg-lime-600  text-left border-b border-gray-200'
+                >
+                  {headers?.map(
+                    (header, j) =>
+                      header && (
+                        <td key={`cell${i}-${j}`}>
+                          <p className='w-48 overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
+                            {data[header as keyof User]}
+                          </p>
+                        </td>
+                      )
+                  )}
+                  <div className='grid place-content-center text-primary '>
+                    <td className='w-full'>
+                      <button
+                        className=' w-full  bg-blue-700 p-2 rounded-md'
+                        onClick={() => handleEdit(data.id)}
+                      >
+                        EDIT
+                      </button>
+                    </td>
+                    <td className='w-full'>
+                      <button
+                        className=' w-full bg-red-700  p-2 rounded-md'
+                        onClick={() => handleDelete(data.id)}
+                      >
+                        DELETE
+                      </button>
+                    </td>
+                  </div>
+                </tr>
+              ))}
+            {searchTerm &&
+              filteredUsers?.map((data, i) => (
+                <tr
+                  key={`row${i}`}
+                  className=' not-odd:bg-lime-600  text-left border-b border-gray-200'
+                >
+                  {headers?.map(
+                    (header, j) =>
+                      header && (
+                        <td key={`cell${i}-${j}`}>
+                          <p className='w-48 overflow-ellipsis overflow-hidden whitespace-nowrap p-2'>
+                            {data[header as keyof User]}
+                          </p>
+                        </td>
+                      )
+                  )}
+                  <div className='grid place-content-center text-primary '>
+                    <td className='w-full'>
+                      <button
+                        className=' w-full  bg-blue-700 p-2 rounded-md'
+                        onClick={() => handleEdit(data.id)}
+                      >
+                        EDIT
+                      </button>
+                    </td>
+                    <td className='w-full'>
+                      <button
+                        className=' w-full bg-red-700  p-2 rounded-md'
+                        onClick={() => handleDelete(data.id)}
+                      >
+                        DELETE
+                      </button>
+                    </td>
+                  </div>
+                </tr>
+              ))}
           </tbody>
         </table>
         {userToEdit && (
-        <EditModal userToEdit={userToEdit} handleSubmit={handleSubmit} setUserToEdit={setUserToEdit} errors={errors}  />
-      )}
+          <EditModal
+            userToEdit={userToEdit}
+            handleSubmit={handleSubmit}
+            setUserToEdit={setUserToEdit}
+            errors={errors}
+          />
+        )}
       </div>
     </>
   );
