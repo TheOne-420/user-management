@@ -61,14 +61,14 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                     }));
                   }}
                 >
-                  <option value='' className='text-black'>
-                    Choose a role
+                  <option value='' className='dark:text-accent-dark text-black dark:bg-accent'>
+                    ----Choose a role----
                   </option>
                   {options?.map((option: string, i: number) => {
                     
                     return (
                       <option
-                        className={` overflow-ellipsis hover:text-accent-dark hover:dark:bg-primary-dark  rounded-md border-2 px-2 dark:text-accent-dark text-black dark:bg-accent`}
+                        className={` overflow-ellipsis hover:text-secondary-dark blur:dark:bg-secondary-dark  rounded-md border-2 px-2 dark:text-accent-dark text-black dark:bg-accent`}
                         key={i}
                         value={option}
                       >

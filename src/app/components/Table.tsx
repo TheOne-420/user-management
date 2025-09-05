@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, use, useEffect, useState } from "react";
 import { getUsers } from "../actions/getUsers";
 import { User, UserSchema } from "../validation/UserSchema";
 import { deleteUser } from "../actions/deleteUser";
@@ -28,9 +28,13 @@ const dummyData = [
 ];
 function Table() {
   const [users, setUsers] = useState<User[] | null>(null);
+  const [sortTerm, setSortTerm] = useState<{
+    key: string;
+    direction: string;
+  } | null>(null);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage, setUsersPerPage] = useState(5); // Or any number you choose
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [usersPerPage, setUsersPerPage] = useState<number>(5);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | "">("");
   const [fields, setFields] = useState(null);
@@ -98,12 +102,50 @@ function Table() {
     window?.location.reload();
     updateUsers(updatedUsers!);
   }
-
+  function sortTable(key: string) {
+    let direction = "ascending";
+    if (
+      sortTerm &&
+      sortTerm.key === key &&
+      sortTerm.direction === "ascending"
+    ) {
+      direction = "descending";
+    }
+    setSortTerm({ key, direction });
+  }
+ 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users?.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(users?.length || 1 / usersPerPage);
-
+  const totalPages = Math.ceil((users?.length ?? 0) / usersPerPage) || 1;
+ const sortedUsers = [...(searchTerm ? filteredUsers ?? [] : currentUsers ?? [])].sort((a, b) => {
+  if (sortTerm === null) {
+    return 0;
+  }
+  const aValue = a[sortTerm.key];
+  const bValue = b[sortTerm.key];
+  if (aValue === undefined) return 1;
+  if (bValue === undefined) return -1;
+  if (typeof aValue === 'string' && typeof bValue === 'string') {
+    const comparison = aValue.localeCompare(bValue);
+    return sortTerm.direction === 'ascending' ? comparison : -comparison;
+  }
+  
+  
+  if (aValue < bValue) {
+    return sortTerm.direction === 'ascending' ? -1 : 1;
+  }
+  if (aValue > bValue) {
+    return sortTerm.direction === 'ascending' ? 1 : -1;
+  }
+  return 0;
+}); 
+ 
+  
+  useEffect(() => {
+    if (!sortTerm) return;
+      setUsers(sortedUsers);
+  }, [sortTerm]);
   return (
     <>
       <Navbar />
@@ -126,11 +168,20 @@ function Table() {
                   return null;
                 }
                 return (
-                  <th key={`header${i}`} className=''>
-                    <p className='p-2 '>
+                  <th
+                    key={`header${i}`}
+                    className='cursor-pointer'
+                    onClick={() => sortTable(header)}
+                  >
+                    <p className='p-2'>
                       {header !== undefined &&
                         header?.charAt(0).toUpperCase() +
                           header?.slice(1).toLowerCase()}
+                      {sortTerm?.key === header && (
+                        <span className='ml-1'>
+                          {sortTerm.direction === "ascending" ? "▲" : "▼"}
+                        </span>
+                      )}
                     </p>
                   </th>
                 );
@@ -183,10 +234,10 @@ function Table() {
             disabled={currentPage === 1}
             className='inline-flex place-content-center gap-2  p-2 mx-1 w-25 bg-gray-500 rounded'
           >
-            < ArrowBigLeftDash />
-            Previous 
+            <ArrowBigLeftDash />
+            Previous
           </button>
-          <span>
+          <span className='self-center mx-2 font-bold bg-gray-700 p-2 rounded'>
             Page {currentPage} of {totalPages}
           </span>
           <button
