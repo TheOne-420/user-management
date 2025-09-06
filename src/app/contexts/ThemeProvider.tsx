@@ -8,6 +8,7 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType>({ theme: "light", setTheme: () => {} });
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  
   useEffect(() => {
     if (!localStorage) {
         return;

@@ -16,13 +16,7 @@ type Field = {
   options?: string[];
 };
 function Form() {
-  const initialFormState: User = {
-    fullName: "",
-    email: "",
-    age: 0,
-    role: "",
-    bio: "",
-  };
+
   const [formData, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [fields, setFields] = useState<Field[]>([]);
@@ -31,13 +25,10 @@ function Form() {
   }>();
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setErrors(null);
+    setErrors(undefined);
     const res = z.safeParse(UserSchema, formData);
-    console.log(formData)
     if (!res.success) {
-      console.log("ERROR", res?.error)
       setErrors(z.flattenError(res.error)?.fieldErrors);
-      console.log(formData)
     } else {
       addUser(formData);
       setFormData({});
@@ -56,12 +47,12 @@ function Form() {
   return (
     <>
     <Navbar />
-    <Suspense fallback={<p>Loading...</p>}>
-      {false ? (
+    <Suspense >
+      {false? (
         <Loading />
       ) : (
         
-        <div  className='overflow-auto'>
+        <div  className='overflow-auto dark:bg-secondary-dark'>
 
         <form
           className='overflow-auto w-screen h-screen flex   border-rounded-md '

@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={theme === "dark" ? "dark" : ""}>
       <ThemeContext>
-        <body className={`bg-primary text-accent ${theme}` }>{children}</body>
+        <body className={`bg-primary text-accent` }>{children}</body>
       </ThemeContext>
     </html>
   );

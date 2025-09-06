@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
-import React, { use, useState } from "react";
+import React from "react";
 import { useTheme } from "../contexts/ThemeProvider";
 import { MoonStarIcon, Sun } from "lucide-react";
 
 function Navbar() {
   const { theme, setTheme } = useTheme();
   return (
-    <nav className='overflow-hidden sticky top-0 z-50 backdrop-blur-lg  flex flex-1 items-center justify-around bg-secondary text-primary p-4 shadow-md dark:bg-secondary-dark dark:text-accent-dark'>
+    <nav className=' sticky top-0 z-50 backdrop-blur-lg  flex flex-1 items-center justify-around bg-secondary text-primary p-4 shadow-md dark:bg-primary-dark dark:text-accent-dark'>
       <div className=' px-4 rounded-4xl shadow-2xl backdrop-blur-2xl  border-neutral-50 border-2  flex gap-2 w-[80%] items-center justify-around'>
         <Link href='/form' className='underline flex-1'>
           FORM

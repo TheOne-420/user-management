@@ -5,28 +5,14 @@ import { getUsers } from "../actions/getUsers";
 import { User, UserSchema } from "../validation/UserSchema";
 import { deleteUser } from "../actions/deleteUser";
 import { getUserById } from "../actions/getUserById";
-import z, { regex } from "zod";
+import userSchema from '@/app/lib/schema.json'
+import z from "zod";
 import EditModal from "./EditModal";
 import { updateUsers } from "../actions/updateUsers";
 import Navbar from "./Navbar";
 import { ArrowBigLeftDash, ArrowBigRightDash } from "lucide-react";
 import Loading from "./Loading";
-const dummyData = [
-  {
-    fullName: "Tabish",
-    email: "tab@gmail.com",
-    age: 20,
-    role: "Admin",
-    bio: "I'm Tabish",
-  },
-  {
-    fullName: "Dev",
-    email: "Dev@gmail.com",
-    age: 20,
-    role: "Editor",
-    bio: "I'm Dev",
-  },
-];
+
 function Table() {
   const [users, setUsers] = useState<User[] | null>(null);
   const [sortTerm, setSortTerm] = useState<{
@@ -38,43 +24,51 @@ function Table() {
   const [usersPerPage, setUsersPerPage] = useState<number>(5);
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | "">("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string | "">("");
   const [fields, setFields] = useState(null);
   const [errors, setErrors] = useState(null);
   const [headers, setHeaders] = useState<string[]>([]);
 
   useEffect(() => {
-    async function loadFields() {
-      const response = await fetch("/schema.json");
-      const result = await response.json();
+     function loadFields() {
+      const result = userSchema
 
       const rowNames = result?.fields?.map((res) => {
         if (res.table) {
           return res.name;
         }
       });
-      setHeaders(rowNames);
+      setHeaders(rowNames.filter((name) => name !== undefined) as string[]);
     }
     loadFields();
     setUsers(getUsers());
-  }, []);
-  useEffect(() => {
+  }, []);useEffect(() => {
     const handler = setTimeout(() => {
-      setSearchTerm(searchTerm);
-    }, 1500);
+      setDebouncedSearchTerm(searchTerm);
+      console.log("Searching for", searchTerm);
+    }, 300); 
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]); 
+
+ 
+  useEffect(() => {
+    
     const searchResults = users?.filter((user) => {
-      const regex = new RegExp(searchTerm, "i");
+      const regex = new RegExp(debouncedSearchTerm, "i");
       try {
         return regex.test(user.email) || regex.test(user.fullName);
       } catch (error) {
         console.error(error);
-        setSearchTerm("");
+        setDebouncedSearchTerm(""); 
+        return false;
       }
     });
     setFilteredUsers(searchResults);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm, users]);
+  }, [debouncedSearchTerm, users]); 
+
   function handleEdit(id: string) {
     setUserToEdit(getUserById(id));
   }
@@ -134,10 +128,10 @@ function Table() {
       return sortTerm.direction === "ascending" ? comparison : -comparison;
     }
 
-    if (aValue < bValue) {
+    if (aValue! < bValue!) {
       return sortTerm.direction === "ascending" ? -1 : 1;
     }
-    if (aValue > bValue) {
+    if (aValue! > bValue!) {
       return sortTerm.direction === "ascending" ? 1 : -1;
     }
     return 0;
@@ -151,7 +145,7 @@ function Table() {
     <>
       <Navbar />
       <Suspense fallback={<Loading />}>
-        <div className='md:flex hidden overflow-auto w-screen p-4 h-screen  flex-col place-content-center text-primary'>
+        <div className='dark:bg-secondary-dark md:flex hidden overflow-auto w-screen h-screen p-4   flex-col place-content-center text-primary'>
           <input
             type='text'
             name='search'
@@ -162,7 +156,7 @@ function Table() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
-          <table className='w-full bg-gray-600 '>
+          <table className='w-full bg-gray-600 dark:bg-primary-dark  '>
             <thead>
               <tr className='text-left  border-b-4 border-gray-400 font-bold'>
                 {headers?.map((header, i) => {
@@ -196,7 +190,7 @@ function Table() {
               {(!searchTerm ? currentUsers : filteredUsers)?.map((data, i) => (
                 <tr
                   key={`row${i}`}
-                  className=' not-odd:bg-lime-600  text-left border-b border-gray-200'
+                  className=' not-odd:bg-secondary  not-odd:dark:bg-accent-dark not-odd:dark:text-primary-dark  text-left border-b border-gray-200'
                 >
                   {headers?.map(
                     (header, j) =>
@@ -234,7 +228,7 @@ function Table() {
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className='inline-flex place-content-center gap-2  p-2 mx-1 w-25 bg-gray-500 rounded'
+              className='disabled:cursor-not-allowed disabled:opacity-70 inline-flex place-content-center gap-2  p-2 mx-1 w-25 bg-gray-500 rounded'
             >
               <ArrowBigLeftDash />
               Previous
@@ -245,7 +239,7 @@ function Table() {
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className='inline-flex place-content-center gap-2 p-2 w-25 mx-1 bg-gray-500 rounded'
+              className='disabled:cursor-not-allowed disabled:opacity-70 inline-flex place-content-center gap-2 p-2 w-25 mx-1 bg-gray-500 rounded'
             >
               Next <ArrowBigRightDash />
             </button>

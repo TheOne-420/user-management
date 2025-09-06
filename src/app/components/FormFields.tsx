@@ -13,7 +13,7 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
         switch (type) {
           case "textarea":
             return (
-              <>
+              <React.Fragment key={idx}>
                 <label key={`label${name}${idx}`} htmlFor={name}>
                   {label}
                 </label>
@@ -21,8 +21,8 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   name={name}
                   id={name}
                   placeholder={placeholder}
-                  className={` ${errors && errors[name] ? "border-red-400" : "border-secondary dark:border-primary-dark "} overflow-ellipsis  rounded-md border-2 px-2   placeholder:text-secondary placeholder:dark:text-accent-dark`}
-                  value={formData[name as keyof User]}
+                  className={` ${errors && errors[name] ? "border-red-400" : "border-secondary dark:border-primary-dark "} overflow-ellipsis  rounded-md border-2 px-2   placeholder:text-secondary dark:placeholder:text-accent-dark`}
+                  value={formData[name as keyof User] || ''}
                   onChange={(e) => {
                     const newValue: string = e.target.value;
                     setFormData((prev: User) => ({
@@ -36,11 +36,11 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   <p className='text-red-500 font-bold '>{errors[name][0]}</p>
                 )}
                 <br />
-              </>
+              </React.Fragment >
             );
           case "select":
             return (
-              <>
+              <React.Fragment key={idx}>
                 <label key={`label${name}${idx}`} htmlFor={name}>
                   {label}
                 </label>
@@ -50,7 +50,7 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   className={` ${errors && errors[name] ? "outline-red-400" : "outline-secondary dark:border-primary-dark dark:outline-primary-dark "} overflow-ellipsis rounded-md border-2 px-2   placeholder:text-secondary placeholder:dark:text-accent-dark`}
                   onChange={(e) => {
 
-                    let newValue = e.target.value;
+                    let newValue: string | number = e.target.value;
                     console.log("New",newValue)
                     if (!isNaN(Number(newValue))) {
                       newValue = Number(newValue);
@@ -81,16 +81,17 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   <p className='text-red-500 font-bold '>{errors[name][0]}</p>
                 )}
                 <br />
-              </>
+              </React.Fragment>
             );
           case "radio":
             return (
-              <>
+              <React.Fragment key={idx}>
                 <label key={`label${name}${idx}`}>{label}</label>
                 <div className='flex flex-col gap-2'>
                   {options?.map((option: string, i: number) => (
                     <div key={i} className='flex items-center gap-2'>
                       <input
+                        key={`input${name}${idx}`}
                         type='radio'
                         name={name}
                         id={`${name}-${i}`}
@@ -103,7 +104,7 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                           }))
                         }
                       />
-                      <label htmlFor={`${name}-${i}`}>{option}</label>
+                      <label key={`label${name}${idx}`} htmlFor={`${name}-${i}`}>{option}</label>
                     </div>
                   ))}
                 </div>
@@ -111,11 +112,11 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   <p className='text-red-500 font-bold'>{errors[name][0]}</p>
                 )}
                 <br />
-              </>
+              </React.Fragment>
             );
           default:
             return (
-              <>
+              <React.Fragment key={idx}>
                 <label key={`label${name}${idx}`} htmlFor={name}>
                   {label}
                 </label>
@@ -124,7 +125,7 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   type={type}
                   name={name}
                   placeholder={placeholder} 
-                  className={`${errors && errors[name] ? "border-red-400" : "border-secondary dark:border-primary-dark"} overflow-ellipsi rounded-md border-2  px-2`}
+                  className={`${errors && errors[name] ? "border-red-400" : "border-secondary dark:border-primary-dark"} overflow-ellipsis dark:placeholder:text-accent-dark rounded-md border-2  px-2`}
                   value={formData[name as keyof User] ?? ""}
                   onChange={(e) => {
                     let newValue: string | number = e.target.value;
@@ -141,7 +142,7 @@ function FormFields({errors, setErrors, formData,setFormData,fields}) {
                   <p className='text-red-500  font-bold'>{errors[name][0]}</p>
                 )}
                 <br />
-              </>
+              </React.Fragment >
             );
         }
       })}
