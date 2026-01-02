@@ -3,10 +3,10 @@
 
 
 ### Tech Stack:
--Next.js
--React.js
--TailwindCSS
--Zod
+- Next.js
+- React.js
+- TailwindCSS
+- Zod
 
 ### Features:
 Dynamic Form from JSON
